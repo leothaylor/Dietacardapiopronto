@@ -58,6 +58,15 @@ function normalizeAndValidateInput(key, value) {
   return numericValue;
 }
 
+const resolveStaticAsset = (relativePath) => {
+  try {
+    return new URL(relativePath, window.location.href).toString();
+  } catch (e) {
+    console.warn("Falha ao resolver caminho estático", relativePath, e);
+    return relativePath;
+  }
+};
+
 const loadState = (key, defaultState) => {
   try {
     const raw = localStorage.getItem(key);
@@ -283,7 +292,8 @@ function App(){
       const migratedDays = normalizeDays(legacyDays, migratedSlots);
       const migratedCurrentDay = migratedDays[legacyCurrentDay] ? legacyCurrentDay : Object.keys(migratedDays)[0] || INITIAL_DAY_ID;
       profilesList = [{ id: migratedId, name: migratedName }];
-      saveState(makeProfileKey(migratedId, 'profile'), legacyProfile ? { ...DEFAULT_PROFILE, ...legacyProfile } : DEFAULT_PROFILE);
+      const migratedProfile = legacyProfile ? sanitizeProfile({ ...DEFAULT_PROFILE, ...legacyProfile }) : DEFAULT_PROFILE;
+      saveState(makeProfileKey(migratedId, 'profile'), migratedProfile);
       saveState(makeProfileKey(migratedId, 'slots'), migratedSlots);
       saveState(makeProfileKey(migratedId, 'days'), migratedDays);
       saveState(makeProfileKey(migratedId, 'current_day'), migratedCurrentDay);
@@ -301,6 +311,9 @@ function App(){
 
     let selectedId = loadState(SELECTED_PROFILE_ID_KEY, profilesList[0]?.id || null);
     if (!profilesList.some(p=>p.id===selectedId)) selectedId = profilesList[0]?.id || null;
+
+    saveState(PROFILES_INDEX_KEY, profilesList);
+    if (selectedId) saveState(SELECTED_PROFILE_ID_KEY, selectedId);
 
     setProfiles(profilesList);
     setSelectedProfileId(selectedId);
@@ -488,7 +501,8 @@ function App(){
   useEffect(()=>{
     let isMounted = true;
     setIsMealsLoading(true);
-    fetch('./alimentos.json', { cache: 'no-store' })
+    const alimentosUrl = resolveStaticAsset('alimentos.json');
+    fetch(alimentosUrl, { cache: 'no-store' })
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
