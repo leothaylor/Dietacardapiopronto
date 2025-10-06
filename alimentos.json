@@ -1,0 +1,111 @@
+{
+  "meals": [
+    {
+      "id": "whey_agua",
+      "name": "Whey Protein Isolado (Água)",
+      "block": "250",
+      "tags": ["High Protein", "Low Carb", "Quick"],
+      "ingredients": [
+        {"name": "Whey Protein (1 Scoop)", "protein": 25, "carbs": 5, "fats": 4, "baseKcal": 155}
+      ]
+    },
+    {
+      "id": "shake_caseina",
+      "name": "Shake de Caseína (Pré-Cama)",
+      "block": "250",
+      "tags": ["High Protein", "Low Carb"],
+      "ingredients": [
+        {"name": "Caseína/Whey", "protein": 30, "carbs": 4, "fats": 3, "baseKcal": 170}
+      ]
+    },
+    {
+      "id": "ovo_cozido",
+      "name": "2 Ovos Cozidos",
+      "block": "250",
+      "tags": ["High Protein", "Low Carb", "High Fat"],
+      "ingredients": [
+        {"name": "Ovo Cozido (2 unid.)", "protein": 12, "carbs": 1, "fats": 10, "baseKcal": 140}
+      ]
+    },
+    {
+      "id": "fruta_pasta_amendoim",
+      "name": "Banana + Pasta de Amendoim",
+      "block": "250",
+      "tags": ["High Carb", "Balanced", "Plant-Based"],
+      "ingredients": [
+        {"name": "Banana (média)", "protein": 1, "carbs": 27, "fats": 0, "baseKcal": 105},
+        {"name": "Pasta de Amendoim (1 col. sopa)", "protein": 6, "carbs": 8, "fats": 8, "baseKcal": 145}
+      ]
+    },
+    {
+      "id": "tapioca_ovo_queijo",
+      "name": "Tapioca c/ Ovos e Queijo Minas",
+      "block": "350",
+      "tags": ["Balanced", "Quick", "BR"],
+      "ingredients": [
+        {"name": "Massa de Tapioca (40g)", "protein": 0, "carbs": 35, "fats": 0, "baseKcal": 140},
+        {"name": "2 Ovos + 1 Clara", "protein": 18, "carbs": 0, "fats": 10, "baseKcal": 160},
+        {"name": "Queijo Minas (30g)", "protein": 7, "carbs": 0, "fats": 5, "baseKcal": 60}
+      ]
+    },
+    {
+      "id": "shake_prot_pos",
+      "name": "Shake Pós-Treino Rápido (Completo)",
+      "block": "350",
+      "tags": ["High Protein", "Post-Workout", "High Carb"],
+      "ingredients": [
+        {"name": "Whey Protein (1 Scoop)", "protein": 25, "carbs": 5, "fats": 4, "baseKcal": 155},
+        {"name": "Banana (pequena)", "protein": 1, "carbs": 23, "fats": 0, "baseKcal": 90},
+        {"name": "Aveia (1 col. sopa)", "protein": 4, "carbs": 12, "fats": 2, "baseKcal": 80}
+      ]
+    },
+    {
+      "id": "iogurte_prot_fruta",
+      "name": "Iogurte Proteico + Aveia e Fruta",
+      "block": "350",
+      "tags": ["Balanced", "Quick"],
+      "ingredients": [
+        {"name": "Iogurte Natural/Grego (170g)", "protein": 10, "carbs": 15, "fats": 9, "baseKcal": 180},
+        {"name": "Aveia (15g)", "protein": 3, "carbs": 9, "fats": 1, "baseKcal": 60},
+        {"name": "Banana (média)", "protein": 1, "carbs": 27, "fats": 0, "baseKcal": 105}
+      ]
+    },
+    {
+      "id": "frango_arroz_feijao_padrao",
+      "name": "Frango, Arroz, Feijão (Almoço Padrão)",
+      "block": "500",
+      "tags": ["Balanced", "High Protein", "BR"],
+      "ingredients": [
+        {"name": "Arroz Integral Cozido (100g)", "protein": 2, "carbs": 28, "fats": 1, "baseKcal": 130},
+        {"name": "Feijão Cozido (100g)", "protein": 5, "carbs": 15, "fats": 1, "baseKcal": 100},
+        {"name": "Peito de Frango Grelhado (120g cru)", "protein": 34, "carbs": 0, "fats": 5, "baseKcal": 180},
+        {"name": "Azeite (1 col. chá)", "protein": 0, "carbs": 0, "fats": 5, "baseKcal": 45},
+        {"name": "Salada e Legumes (Livre)", "protein": 2, "carbs": 5, "fats": 0, "baseKcal": 30}
+      ]
+    },
+    {
+      "id": "salmao_quinoa_espinafre",
+      "name": "Salmão Grelhado c/ Quinoa e Espinafre",
+      "block": "500",
+      "tags": ["High Fat Saudável", "Balanced"],
+      "ingredients": [
+        {"name": "Salmão Grelhado (100g)", "protein": 25, "carbs": 0, "fats": 15, "baseKcal": 240},
+        {"name": "Quinoa Cozida (80g)", "protein": 3, "carbs": 14, "fats": 1, "baseKcal": 80},
+        {"name": "Espinafre Refogado (Livre)", "protein": 3, "carbs": 5, "fats": 5, "baseKcal": 70},
+        {"name": "Azeite (1 col. sopa)", "protein": 0, "carbs": 0, "fats": 13, "baseKcal": 117}
+      ]
+    },
+    {
+      "id": "massa_pesto_frango_azeitonas",
+      "name": "Massa Integral c/ Pesto, Frango e Azeitonas",
+      "block": "750",
+      "tags": ["High Carb", "High Protein", "Post-Workout"],
+      "ingredients": [
+        {"name": "Massa Integral Cozida (150g)", "protein": 7, "carbs": 45, "fats": 2, "baseKcal": 230},
+        {"name": "Peito de Frango Picado (150g)", "protein": 40, "carbs": 0, "fats": 6, "baseKcal": 226},
+        {"name": "Molho Pesto (2 col. sopa)", "protein": 5, "carbs": 5, "fats": 20, "baseKcal": 220},
+        {"name": "Tomate Seco e Azeitonas", "protein": 0, "carbs": 5, "fats": 6, "baseKcal": 70}
+      ]
+    }
+  ]
+}
