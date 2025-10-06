@@ -63,20 +63,6 @@ const loadState = (key, defaultState) => {
     const raw = localStorage.getItem(key);
     if (raw === null || raw === "undefined") return defaultState;
     const state = JSON.parse(raw);
-
-    if (key === PROFILE_STORAGE_KEY) {
-      const validated = { ...state };
-      let reset = false;
-      Object.keys(INPUT_RANGES).forEach(k => {
-        const r = INPUT_RANGES[k];
-        const v = Number(state[k]);
-        if (Number.isNaN(v) || v < r.min || v > r.max) { validated[k] = DEFAULT_PROFILE[k]; reset = true; }
-      });
-      if (!['M','F'].includes(state.sex)) { validated.sex = DEFAULT_PROFILE.sex; reset = true; }
-      if (!['loss','maintain','gain','recomp'].includes(state.goal)) { validated.goal = DEFAULT_PROFILE.goal; reset = true; }
-      if (reset) console.warn("Perfil: valores inválidos restaurados.");
-      return validated;
-    }
     return state;
   } catch(e){ console.error("loadState", key, e); return defaultState; }
 };
@@ -210,6 +196,27 @@ function Section({ title, children, right, isMinimized }) {
 }
 
 const DEFAULT_PROFILE = { sex:"M", age:33, weight:73, height:170, activity:"moderate", goal:"recomp", neck:36, waist:85, hip:95, photoUrl:'https://placehold.co/100x100/1E293B/E2E8F0?text=Foto' };
+
+function sanitizeProfile(rawProfile) {
+  const candidate = { ...DEFAULT_PROFILE, ...(rawProfile || {}) };
+  const validated = { ...candidate };
+  let reset = false;
+
+  Object.keys(INPUT_RANGES).forEach(k => {
+    const range = INPUT_RANGES[k];
+    const value = Number(candidate[k]);
+    if (Number.isNaN(value) || value < range.min || value > range.max) {
+      validated[k] = DEFAULT_PROFILE[k];
+      reset = true;
+    }
+  });
+
+  if (!['M','F'].includes(candidate.sex)) { validated.sex = DEFAULT_PROFILE.sex; reset = true; }
+  if (!['loss','maintain','gain','recomp'].includes(candidate.goal)) { validated.goal = DEFAULT_PROFILE.goal; reset = true; }
+
+  if (reset) console.warn("Perfil: valores inválidos restaurados.");
+  return validated;
+}
 const INITIAL_SLOT_KEYS = [`slot-1`,`slot-2`,`slot-3`,`slot-4`];
 const getInitialDayState = (keys) => keys.reduce((acc,k)=>({ ...acc, [k]:[] }),{});
 const normalizeDays = (days, slotKeys) => {
@@ -224,7 +231,7 @@ const normalizeDays = (days, slotKeys) => {
   return normalized;
 };
 const loadProfileBundle = (profileId) => {
-  const storedProfile = loadState(makeProfileKey(profileId, 'profile'), DEFAULT_PROFILE) || DEFAULT_PROFILE;
+  const storedProfile = sanitizeProfile(loadState(makeProfileKey(profileId, 'profile'), DEFAULT_PROFILE));
   const storedSlots = loadState(makeProfileKey(profileId, 'slots'), INITIAL_SLOT_KEYS);
   const slotKeys = Array.isArray(storedSlots) && storedSlots.length>0 ? storedSlots : INITIAL_SLOT_KEYS;
   const storedDays = loadState(makeProfileKey(profileId, 'days'), { [INITIAL_DAY_ID]: getInitialDayState(slotKeys) });
@@ -232,7 +239,7 @@ const loadProfileBundle = (profileId) => {
   const storedCurrentDay = loadState(makeProfileKey(profileId, 'current_day'), Object.keys(normalizedDays)[0] || INITIAL_DAY_ID);
   const currentDayId = normalizedDays[storedCurrentDay] ? storedCurrentDay : Object.keys(normalizedDays)[0] || INITIAL_DAY_ID;
   return {
-    profile: { ...DEFAULT_PROFILE, ...storedProfile },
+    profile: storedProfile,
     slotKeys,
     allDays: normalizedDays,
     currentDayId,
