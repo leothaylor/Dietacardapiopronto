@@ -59,9 +59,23 @@ function normalizeAndValidateInput(key, value) {
   return numericValue;
 }
 
+const STATIC_BASE_URL = (() => {
+  try {
+    const { origin, pathname } = window.location;
+    if (pathname.endsWith('/')) return `${origin}${pathname}`;
+    if (pathname.includes('.')) {
+      return `${origin}${pathname.slice(0, pathname.lastIndexOf('/') + 1)}`;
+    }
+    return `${origin}${pathname}/`;
+  } catch (error) {
+    console.warn('Não foi possível determinar a base estática', error);
+    return window.location ? window.location.href : '';
+  }
+})();
+
 const resolveStaticAsset = (relativePath) => {
   try {
-    return new URL(relativePath, window.location.href).toString();
+    return new URL(relativePath, STATIC_BASE_URL).toString();
   } catch (e) {
     console.warn("Falha ao resolver caminho estático", relativePath, e);
     return relativePath;
@@ -275,65 +289,106 @@ function App(){
   const day = allDays[currentDayId] || getInitialDayState(slotKeys);
 
   useEffect(()=>{
-    setIsProfileHydrating(true);
-    let profilesList = [];
-    const storedProfiles = loadState(PROFILES_INDEX_KEY, null);
-    if (Array.isArray(storedProfiles)) {
-      profilesList = storedProfiles.filter(p=>p && p.id && p.name);
-    }
+    let cancelled = false;
+    const fallbackBootstrap = () => {
+      const fallbackId = generateProfileId();
+      const fallbackMeta = { id: fallbackId, name: 'Perfil Principal' };
+      const fallbackDays = { [INITIAL_DAY_ID]: getInitialDayState(INITIAL_SLOT_KEYS) };
+      setProfiles([fallbackMeta]);
+      setSelectedProfileId(fallbackId);
+      setProfile(DEFAULT_PROFILE);
+      setSlotKeys(INITIAL_SLOT_KEYS);
+      setAllDays(fallbackDays);
+      setCurrentDayId(INITIAL_DAY_ID);
+      setProfileNameDraft(fallbackMeta.name);
+      try {
+        saveState(makeProfileKey(fallbackId, 'profile'), DEFAULT_PROFILE);
+        saveState(makeProfileKey(fallbackId, 'slots'), INITIAL_SLOT_KEYS);
+        saveState(makeProfileKey(fallbackId, 'days'), fallbackDays);
+        saveState(makeProfileKey(fallbackId, 'current_day'), INITIAL_DAY_ID);
+        saveState(PROFILES_INDEX_KEY, [fallbackMeta]);
+        saveState(SELECTED_PROFILE_ID_KEY, fallbackId);
+      } catch (err) {
+        console.error('Não foi possível salvar estado padrão', err);
+      }
+    };
 
-    if (profilesList.length === 0) {
-      const singleProfile = loadState(PROFILE_STORAGE_KEY, null);
-      const legacyProfile = singleProfile || loadState(LEGACY_PROFILE_STORAGE_KEY, null);
-      const legacySlots = loadState(LEGACY_SLOTS_STORAGE_KEY, null);
-      const legacyDays = loadState(LEGACY_ALL_DAYS_STORAGE_KEY, null);
-      const legacyCurrentDay = loadState(LEGACY_CURRENT_DAY_ID_STORAGE_KEY, null);
-      const migratedId = generateProfileId();
-      const migratedName = legacyProfile && typeof legacyProfile.name === 'string' && legacyProfile.name.trim().length>0 ? legacyProfile.name.trim() : 'Perfil Principal';
-      const migratedSlots = Array.isArray(legacySlots) && legacySlots.length>0 ? legacySlots : INITIAL_SLOT_KEYS;
-      const migratedDays = normalizeDays(legacyDays, migratedSlots);
-      const migratedCurrentDay = migratedDays[legacyCurrentDay] ? legacyCurrentDay : Object.keys(migratedDays)[0] || INITIAL_DAY_ID;
-      profilesList = [{ id: migratedId, name: migratedName }];
-      const migratedProfile = legacyProfile ? sanitizeProfile({ ...DEFAULT_PROFILE, ...legacyProfile }) : DEFAULT_PROFILE;
-      saveState(makeProfileKey(migratedId, 'profile'), migratedProfile);
-      saveState(makeProfileKey(migratedId, 'slots'), migratedSlots);
-      saveState(makeProfileKey(migratedId, 'days'), migratedDays);
-      saveState(makeProfileKey(migratedId, 'current_day'), migratedCurrentDay);
-      removeState(PROFILE_STORAGE_KEY);
-      removeState(LEGACY_PROFILE_STORAGE_KEY);
-    }
+    const bootstrap = () => {
+      setIsProfileHydrating(true);
+      try {
+        let profilesList = [];
+        const storedProfiles = loadState(PROFILES_INDEX_KEY, null);
+        if (Array.isArray(storedProfiles)) {
+          profilesList = storedProfiles.filter(p=>p && p.id && p.name);
+        }
 
-    if (profilesList.length === 0) {
-      const defaultId = generateProfileId();
-      profilesList = [{ id: defaultId, name: 'Perfil Principal' }];
-      const defaultDays = { [INITIAL_DAY_ID]: getInitialDayState(INITIAL_SLOT_KEYS) };
-      saveState(makeProfileKey(defaultId, 'profile'), DEFAULT_PROFILE);
-      saveState(makeProfileKey(defaultId, 'slots'), INITIAL_SLOT_KEYS);
-      saveState(makeProfileKey(defaultId, 'days'), defaultDays);
-      saveState(makeProfileKey(defaultId, 'current_day'), INITIAL_DAY_ID);
-    }
+        if (profilesList.length === 0) {
+          const singleProfile = loadState(PROFILE_STORAGE_KEY, null);
+          const legacyProfile = singleProfile || loadState(LEGACY_PROFILE_STORAGE_KEY, null);
+          const legacySlots = loadState(LEGACY_SLOTS_STORAGE_KEY, null);
+          const legacyDays = loadState(LEGACY_ALL_DAYS_STORAGE_KEY, null);
+          const legacyCurrentDay = loadState(LEGACY_CURRENT_DAY_ID_STORAGE_KEY, null);
+          const migratedId = generateProfileId();
+          const migratedName = legacyProfile && typeof legacyProfile.name === 'string' && legacyProfile.name.trim().length>0 ? legacyProfile.name.trim() : 'Perfil Principal';
+          const migratedSlots = Array.isArray(legacySlots) && legacySlots.length>0 ? legacySlots : INITIAL_SLOT_KEYS;
+          const migratedDays = normalizeDays(legacyDays, migratedSlots);
+          const migratedCurrentDay = migratedDays[legacyCurrentDay] ? legacyCurrentDay : Object.keys(migratedDays)[0] || INITIAL_DAY_ID;
+          profilesList = [{ id: migratedId, name: migratedName }];
+          const migratedProfile = legacyProfile ? sanitizeProfile({ ...DEFAULT_PROFILE, ...legacyProfile }) : DEFAULT_PROFILE;
+          saveState(makeProfileKey(migratedId, 'profile'), migratedProfile);
+          saveState(makeProfileKey(migratedId, 'slots'), migratedSlots);
+          saveState(makeProfileKey(migratedId, 'days'), migratedDays);
+          saveState(makeProfileKey(migratedId, 'current_day'), migratedCurrentDay);
+          removeState(PROFILE_STORAGE_KEY);
+          removeState(LEGACY_PROFILE_STORAGE_KEY);
+        }
 
-    let selectedId = loadState(SELECTED_PROFILE_ID_KEY, profilesList[0]?.id || null);
-    if (!profilesList.some(p=>p.id===selectedId)) selectedId = profilesList[0]?.id || null;
+        if (profilesList.length === 0) {
+          const defaultId = generateProfileId();
+          profilesList = [{ id: defaultId, name: 'Perfil Principal' }];
+          const defaultDays = { [INITIAL_DAY_ID]: getInitialDayState(INITIAL_SLOT_KEYS) };
+          saveState(makeProfileKey(defaultId, 'profile'), DEFAULT_PROFILE);
+          saveState(makeProfileKey(defaultId, 'slots'), INITIAL_SLOT_KEYS);
+          saveState(makeProfileKey(defaultId, 'days'), defaultDays);
+          saveState(makeProfileKey(defaultId, 'current_day'), INITIAL_DAY_ID);
+        }
 
-    saveState(PROFILES_INDEX_KEY, profilesList);
-    if (selectedId) saveState(SELECTED_PROFILE_ID_KEY, selectedId);
+        let selectedId = loadState(SELECTED_PROFILE_ID_KEY, profilesList[0]?.id || null);
+        if (!profilesList.some(p=>p.id===selectedId)) selectedId = profilesList[0]?.id || null;
 
-    setProfiles(profilesList);
-    setSelectedProfileId(selectedId);
+        saveState(PROFILES_INDEX_KEY, profilesList);
+        if (selectedId) saveState(SELECTED_PROFILE_ID_KEY, selectedId);
 
-    if (selectedId) {
-      const bundle = loadProfileBundle(selectedId);
-      setProfile(bundle.profile);
-      setSlotKeys(bundle.slotKeys);
-      setAllDays(bundle.allDays);
-      setCurrentDayId(bundle.currentDayId);
-      const activeMeta = profilesList.find(p=>p.id===selectedId);
-      setProfileNameDraft(activeMeta ? activeMeta.name : '');
-    }
+        if (cancelled) return;
+        setProfiles(profilesList);
+        setSelectedProfileId(selectedId);
 
-    setIsInitialized(true);
-    setIsProfileHydrating(false);
+        if (selectedId) {
+          const bundle = loadProfileBundle(selectedId);
+          if (cancelled) return;
+          setProfile(bundle.profile);
+          setSlotKeys(bundle.slotKeys);
+          setAllDays(bundle.allDays);
+          setCurrentDayId(bundle.currentDayId);
+          const activeMeta = profilesList.find(p=>p.id===selectedId);
+          setProfileNameDraft(activeMeta ? activeMeta.name : '');
+        } else {
+          fallbackBootstrap();
+        }
+      } catch (error) {
+        console.error('Falha ao carregar dados locais, aplicando padrão', error);
+        if (!cancelled) fallbackBootstrap();
+      } finally {
+        if (!cancelled) {
+          setIsInitialized(true);
+          setIsProfileHydrating(false);
+        }
+      }
+    };
+
+    bootstrap();
+
+    return () => { cancelled = true; };
   },[]);
 
   useEffect(()=>{
