@@ -26,6 +26,7 @@
 
   <script type="text/babel">
 /* === Estado/Utilidades === */
+const PROFILE_STORAGE_KEY = 'dietacardapio_profile_v1';
 const LEGACY_PROFILE_STORAGE_KEY = "cardapio_profile_v5_3";
 const LEGACY_ALL_DAYS_STORAGE_KEY = "cardapio_all_days_v5_6";
 const LEGACY_SLOTS_STORAGE_KEY = "cardapio_slotkeys_v5_6";
@@ -282,7 +283,8 @@ function App(){
     }
 
     if (profilesList.length === 0) {
-      const legacyProfile = loadState(LEGACY_PROFILE_STORAGE_KEY, null);
+      const singleProfile = loadState(PROFILE_STORAGE_KEY, null);
+      const legacyProfile = singleProfile || loadState(LEGACY_PROFILE_STORAGE_KEY, null);
       const legacySlots = loadState(LEGACY_SLOTS_STORAGE_KEY, null);
       const legacyDays = loadState(LEGACY_ALL_DAYS_STORAGE_KEY, null);
       const legacyCurrentDay = loadState(LEGACY_CURRENT_DAY_ID_STORAGE_KEY, null);
@@ -297,6 +299,8 @@ function App(){
       saveState(makeProfileKey(migratedId, 'slots'), migratedSlots);
       saveState(makeProfileKey(migratedId, 'days'), migratedDays);
       saveState(makeProfileKey(migratedId, 'current_day'), migratedCurrentDay);
+      removeState(PROFILE_STORAGE_KEY);
+      removeState(LEGACY_PROFILE_STORAGE_KEY);
     }
 
     if (profilesList.length === 0) {
@@ -501,7 +505,7 @@ function App(){
   useEffect(()=>{
     let isMounted = true;
     setIsMealsLoading(true);
-    const alimentosUrl = resolveStaticAsset('alimentos.json');
+    const alimentosUrl = resolveStaticAsset('./alimentos.json');
     fetch(alimentosUrl, { cache: 'no-store' })
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
