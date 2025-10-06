@@ -1,0 +1,142 @@
+{
+  "updatedAt": "2024-05-01T00:00:00.000Z",
+  "meals": [
+    {
+      "id": "omelete_espinafre",
+      "name": "Omelete com Espinafre e Queijo Branco",
+      "block": "350",
+      "tags": ["Balanced", "High Protein", "BR"],
+      "ingredients": [
+        { "name": "Ovos (2 unid.)", "protein": 12, "carbs": 2, "fats": 10, "baseKcal": 156 },
+        { "name": "Clara de ovo (1 unid.)", "protein": 3, "carbs": 0, "fats": 0, "baseKcal": 15 },
+        { "name": "Espinafre refogado", "protein": 2, "carbs": 4, "fats": 1, "baseKcal": 35 },
+        { "name": "Queijo branco (30g)", "protein": 7, "carbs": 1, "fats": 5, "baseKcal": 86 }
+      ]
+    },
+    {
+      "id": "acai_proteico",
+      "name": "Açaí Proteico com Granola",
+      "block": "500",
+      "tags": ["High Carb", "Pre-Workout", "Plant-Based"],
+      "ingredients": [
+        { "name": "Polpa de açaí (150g)", "protein": 3, "carbs": 38, "fats": 6, "baseKcal": 220 },
+        { "name": "Whey protein (1 scoop)", "protein": 24, "carbs": 4, "fats": 2, "baseKcal": 130 },
+        { "name": "Granola sem açúcar (20g)", "protein": 3, "carbs": 16, "fats": 4, "baseKcal": 110 }
+      ]
+    },
+    {
+      "id": "frango_batata_doce",
+      "name": "Frango Grelhado com Batata Doce e Brócolis",
+      "block": "500",
+      "tags": ["Balanced", "High Protein", "Gluten Free"],
+      "ingredients": [
+        { "name": "Peito de frango grelhado (150g)", "protein": 38, "carbs": 0, "fats": 6, "baseKcal": 220 },
+        { "name": "Batata doce cozida (120g)", "protein": 2, "carbs": 28, "fats": 0, "baseKcal": 120 },
+        { "name": "Brócolis no vapor (80g)", "protein": 3, "carbs": 6, "fats": 0, "baseKcal": 35 },
+        { "name": "Azeite de oliva (1 c. chá)", "protein": 0, "carbs": 0, "fats": 5, "baseKcal": 45 }
+      ]
+    },
+    {
+      "id": "wrap_peito_peru",
+      "name": "Wrap Integral com Peito de Peru",
+      "block": "350",
+      "tags": ["Quick", "Balanced"],
+      "ingredients": [
+        { "name": "Tortilha integral (1 unid.)", "protein": 5, "carbs": 22, "fats": 3, "baseKcal": 140 },
+        { "name": "Peito de peru (60g)", "protein": 12, "carbs": 2, "fats": 3, "baseKcal": 90 },
+        { "name": "Cottage (40g)", "protein": 5, "carbs": 2, "fats": 1, "baseKcal": 55 },
+        { "name": "Folhas e tomate", "protein": 1, "carbs": 3, "fats": 0, "baseKcal": 18 }
+      ]
+    },
+    {
+      "id": "pao_abacate",
+      "name": "Pão Integral com Abacate e Ovo Pochê",
+      "block": "350",
+      "tags": ["Balanced", "Vegetarian"],
+      "ingredients": [
+        { "name": "Pão integral (2 fatias)", "protein": 8, "carbs": 26, "fats": 3, "baseKcal": 180 },
+        { "name": "Abacate amassado (60g)", "protein": 1, "carbs": 6, "fats": 8, "baseKcal": 110 },
+        { "name": "Ovo pochê (1 unid.)", "protein": 6, "carbs": 1, "fats": 5, "baseKcal": 70 }
+      ]
+    },
+    {
+      "id": "salada_grao_bico",
+      "name": "Salada Mediterrânea de Grão-de-Bico",
+      "block": "350",
+      "tags": ["Plant-Based", "High Fiber", "Lunch"],
+      "ingredients": [
+        { "name": "Grão-de-bico cozido (120g)", "protein": 8, "carbs": 27, "fats": 3, "baseKcal": 180 },
+        { "name": "Pepino, tomate e cebola", "protein": 2, "carbs": 7, "fats": 0, "baseKcal": 40 },
+        { "name": "Azeite e limão", "protein": 0, "carbs": 2, "fats": 7, "baseKcal": 75 }
+      ]
+    },
+    {
+      "id": "shake_aveia_morango",
+      "name": "Shake de Aveia com Morango",
+      "block": "250",
+      "tags": ["Breakfast", "High Carb", "Quick"],
+      "ingredients": [
+        { "name": "Leite desnatado (200ml)", "protein": 7, "carbs": 10, "fats": 1, "baseKcal": 90 },
+        { "name": "Aveia em flocos (20g)", "protein": 3, "carbs": 12, "fats": 2, "baseKcal": 95 },
+        { "name": "Morangos (100g)", "protein": 1, "carbs": 8, "fats": 0, "baseKcal": 35 }
+      ]
+    },
+    {
+      "id": "iogurte_grego_mix",
+      "name": "Iogurte Grego com Nuts e Mel",
+      "block": "250",
+      "tags": ["Snack", "Balanced"],
+      "ingredients": [
+        { "name": "Iogurte grego natural (130g)", "protein": 9, "carbs": 8, "fats": 5, "baseKcal": 120 },
+        { "name": "Mix de nuts (15g)", "protein": 3, "carbs": 4, "fats": 9, "baseKcal": 120 },
+        { "name": "Mel (1 c. chá)", "protein": 0, "carbs": 5, "fats": 0, "baseKcal": 20 }
+      ]
+    },
+    {
+      "id": "tilapia_arroz_couve",
+      "name": "Tilápia Assada com Arroz Integral e Couve",
+      "block": "500",
+      "tags": ["Lunch", "High Protein", "Gluten Free"],
+      "ingredients": [
+        { "name": "Tilápia assada (150g)", "protein": 32, "carbs": 0, "fats": 5, "baseKcal": 185 },
+        { "name": "Arroz integral cozido (120g)", "protein": 3, "carbs": 28, "fats": 1, "baseKcal": 150 },
+        { "name": "Couve refogada", "protein": 2, "carbs": 6, "fats": 3, "baseKcal": 60 },
+        { "name": "Azeite (1 c. chá)", "protein": 0, "carbs": 0, "fats": 5, "baseKcal": 45 }
+      ]
+    },
+    {
+      "id": "macarrao_pesto_frango",
+      "name": "Macarrão Integral ao Pesto com Frango",
+      "block": "750",
+      "tags": ["High Carb", "Post-Workout", "Dinner"],
+      "ingredients": [
+        { "name": "Macarrão integral cozido (180g)", "protein": 9, "carbs": 58, "fats": 3, "baseKcal": 300 },
+        { "name": "Peito de frango em cubos (140g)", "protein": 36, "carbs": 0, "fats": 5, "baseKcal": 210 },
+        { "name": "Molho pesto (2 c. sopa)", "protein": 4, "carbs": 4, "fats": 18, "baseKcal": 210 }
+      ]
+    },
+    {
+      "id": "overnight_chia",
+      "name": "Overnight Oats com Chia e Banana",
+      "block": "350",
+      "tags": ["Breakfast", "High Fiber", "Plant-Based"],
+      "ingredients": [
+        { "name": "Aveia em flocos (40g)", "protein": 6, "carbs": 24, "fats": 4, "baseKcal": 155 },
+        { "name": "Leite vegetal (200ml)", "protein": 3, "carbs": 10, "fats": 3, "baseKcal": 90 },
+        { "name": "Chia (10g)", "protein": 2, "carbs": 4, "fats": 3, "baseKcal": 60 },
+        { "name": "Banana fatiada (80g)", "protein": 1, "carbs": 18, "fats": 0, "baseKcal": 70 }
+      ]
+    },
+    {
+      "id": "sopa_abobora_frango",
+      "name": "Sopa Cremosa de Abóbora com Frango",
+      "block": "250",
+      "tags": ["Dinner", "Low Fat", "Comfort Food"],
+      "ingredients": [
+        { "name": "Abóbora cabotiá cozida (180g)", "protein": 2, "carbs": 20, "fats": 1, "baseKcal": 80 },
+        { "name": "Peito de frango desfiado (70g)", "protein": 18, "carbs": 0, "fats": 2, "baseKcal": 100 },
+        { "name": "Caldo caseiro e temperos", "protein": 1, "carbs": 3, "fats": 1, "baseKcal": 25 }
+      ]
+    }
+  ]
+}

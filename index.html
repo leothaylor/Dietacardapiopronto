@@ -205,10 +205,22 @@ function Section({ title, children, right, isMinimized }) {
   );
 }
 
-const DEFAULT_PROFILE = { sex:"M", age:33, weight:73, height:170, activity:"moderate", goal:"recomp", neck:36, waist:85, hip:95, photoUrl:'https://placehold.co/100x100/1E293B/E2E8F0?text=Foto' };
+const DEFAULT_PROFILE_BASE = {
+  sex: "M",
+  age: 33,
+  weight: 73,
+  height: 170,
+  activity: "moderate",
+  goal: "recomp",
+  neck: 36,
+  waist: 85,
+  hip: 95,
+  photoUrl: 'https://placehold.co/100x100/1E293B/E2E8F0?text=Foto',
+  name: 'Perfil Principal',
+};
 
 function sanitizeProfile(rawProfile) {
-  const candidate = { ...DEFAULT_PROFILE, ...(rawProfile || {}) };
+  const candidate = { ...DEFAULT_PROFILE_BASE, ...(rawProfile || {}) };
   const validated = { ...candidate };
   let reset = false;
 
@@ -216,16 +228,43 @@ function sanitizeProfile(rawProfile) {
     const range = INPUT_RANGES[k];
     const value = Number(candidate[k]);
     if (Number.isNaN(value) || value < range.min || value > range.max) {
-      validated[k] = DEFAULT_PROFILE[k];
+      validated[k] = DEFAULT_PROFILE_BASE[k];
       reset = true;
     }
   });
 
-  if (!['M','F'].includes(candidate.sex)) { validated.sex = DEFAULT_PROFILE.sex; reset = true; }
-  if (!['loss','maintain','gain','recomp'].includes(candidate.goal)) { validated.goal = DEFAULT_PROFILE.goal; reset = true; }
+  if (!['M','F'].includes(candidate.sex)) { validated.sex = DEFAULT_PROFILE_BASE.sex; reset = true; }
+  if (!['loss','maintain','gain','recomp'].includes(candidate.goal)) { validated.goal = DEFAULT_PROFILE_BASE.goal; reset = true; }
+
+  if (typeof candidate.name !== 'string' || candidate.name.trim().length === 0) {
+    validated.name = DEFAULT_PROFILE_BASE.name;
+    reset = true;
+  } else {
+    validated.name = candidate.name.trim();
+  }
+
+  if (typeof candidate.photoUrl !== 'string' || candidate.photoUrl.trim().length === 0) {
+    validated.photoUrl = DEFAULT_PROFILE_BASE.photoUrl;
+  }
+
+  if (typeof candidate.createdAt !== 'string' || Number.isNaN(Date.parse(candidate.createdAt))) {
+    validated.createdAt = new Date().toISOString();
+    reset = true;
+  }
 
   if (reset) console.warn("Perfil: valores inválidos restaurados.");
   return validated;
+}
+
+function createDefaultProfile(overrides = {}) {
+  const baseCreatedAt = overrides.createdAt && !Number.isNaN(Date.parse(overrides.createdAt))
+    ? overrides.createdAt
+    : undefined;
+  return sanitizeProfile({
+    ...DEFAULT_PROFILE_BASE,
+    ...overrides,
+    createdAt: baseCreatedAt || new Date().toISOString(),
+  });
 }
 const INITIAL_SLOT_KEYS = [`slot-1`,`slot-2`,`slot-3`,`slot-4`];
 const getInitialDayState = (keys) => keys.reduce((acc,k)=>({ ...acc, [k]:[] }),{});
@@ -241,7 +280,7 @@ const normalizeDays = (days, slotKeys) => {
   return normalized;
 };
 const loadProfileBundle = (profileId) => {
-  const storedProfile = sanitizeProfile(loadState(makeProfileKey(profileId, 'profile'), DEFAULT_PROFILE));
+  const storedProfile = sanitizeProfile(loadState(makeProfileKey(profileId, 'profile'), createDefaultProfile()));
   const storedSlots = loadState(makeProfileKey(profileId, 'slots'), INITIAL_SLOT_KEYS);
   const slotKeys = Array.isArray(storedSlots) && storedSlots.length>0 ? storedSlots : INITIAL_SLOT_KEYS;
   const storedDays = loadState(makeProfileKey(profileId, 'days'), { [INITIAL_DAY_ID]: getInitialDayState(slotKeys) });
@@ -262,7 +301,7 @@ function App(){
   /* Estado + persistência */
   const [profiles, setProfiles] = useState([]);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
-  const [profile, setProfile] = useState(DEFAULT_PROFILE);
+  const [profile, setProfile] = useState(() => createDefaultProfile());
   const [isProfileLocked, setIsProfileLocked] = useState(false);
   const [slotKeys, setSlotKeys] = useState(INITIAL_SLOT_KEYS);
   const [currentDayId, setCurrentDayId] = useState(INITIAL_DAY_ID);
@@ -294,7 +333,7 @@ function App(){
       const migratedDays = normalizeDays(legacyDays, migratedSlots);
       const migratedCurrentDay = migratedDays[legacyCurrentDay] ? legacyCurrentDay : Object.keys(migratedDays)[0] || INITIAL_DAY_ID;
       profilesList = [{ id: migratedId, name: migratedName }];
-      const migratedProfile = legacyProfile ? sanitizeProfile({ ...DEFAULT_PROFILE, ...legacyProfile }) : DEFAULT_PROFILE;
+      const migratedProfile = legacyProfile ? createDefaultProfile(legacyProfile) : createDefaultProfile();
       saveState(makeProfileKey(migratedId, 'profile'), migratedProfile);
       saveState(makeProfileKey(migratedId, 'slots'), migratedSlots);
       saveState(makeProfileKey(migratedId, 'days'), migratedDays);
@@ -307,7 +346,7 @@ function App(){
       const defaultId = generateProfileId();
       profilesList = [{ id: defaultId, name: 'Perfil Principal' }];
       const defaultDays = { [INITIAL_DAY_ID]: getInitialDayState(INITIAL_SLOT_KEYS) };
-      saveState(makeProfileKey(defaultId, 'profile'), DEFAULT_PROFILE);
+      saveState(makeProfileKey(defaultId, 'profile'), createDefaultProfile());
       saveState(makeProfileKey(defaultId, 'slots'), INITIAL_SLOT_KEYS);
       saveState(makeProfileKey(defaultId, 'days'), defaultDays);
       saveState(makeProfileKey(defaultId, 'current_day'), INITIAL_DAY_ID);
@@ -367,7 +406,7 @@ function App(){
 
   useEffect(()=>{
     if (!isInitialized || !selectedProfileId || isProfileHydrating) return;
-    saveState(makeProfileKey(selectedProfileId, 'profile'), profile);
+    saveState(makeProfileKey(selectedProfileId, 'profile'), sanitizeProfile(profile));
   },[profile, selectedProfileId, isInitialized, isProfileHydrating]);
 
   useEffect(()=>{
@@ -411,6 +450,7 @@ function App(){
     const finalName = trimmed.length>0 ? trimmed : `Perfil ${fallbackIndex}`;
     setProfiles(prev=> prev.map(p=> p.id===selectedProfileId ? { ...p, name: finalName } : p));
     setProfileNameDraft(finalName);
+    setProfile(prev => ({ ...prev, name: finalName }));
   };
 
   const handleCreateProfile = (name) => {
@@ -418,13 +458,14 @@ function App(){
     const finalName = trimmed.length>0 ? trimmed : `Perfil ${profiles.length+1}`;
     const newId = generateProfileId();
     const defaultDays = { [INITIAL_DAY_ID]: getInitialDayState(INITIAL_SLOT_KEYS) };
-    saveState(makeProfileKey(newId, 'profile'), DEFAULT_PROFILE);
+    const newProfileState = createDefaultProfile({ name: finalName });
+    saveState(makeProfileKey(newId, 'profile'), newProfileState);
     saveState(makeProfileKey(newId, 'slots'), INITIAL_SLOT_KEYS);
     saveState(makeProfileKey(newId, 'days'), defaultDays);
     saveState(makeProfileKey(newId, 'current_day'), INITIAL_DAY_ID);
     setProfiles(prev=> [...prev, { id: newId, name: finalName }]);
     setIsProfileHydrating(true);
-    setProfile(DEFAULT_PROFILE);
+    setProfile(newProfileState);
     setSlotKeys(INITIAL_SLOT_KEYS);
     setAllDays(defaultDays);
     setCurrentDayId(INITIAL_DAY_ID);
@@ -453,15 +494,16 @@ function App(){
       const fallbackId = generateProfileId();
       const fallbackMeta = { id: fallbackId, name: 'Perfil Principal' };
       const fallbackDays = { [INITIAL_DAY_ID]: getInitialDayState(INITIAL_SLOT_KEYS) };
+      const fallbackProfileState = createDefaultProfile({ name: fallbackMeta.name });
       setProfiles([fallbackMeta]);
       setIsProfileHydrating(true);
       setSelectedProfileId(fallbackId);
-      setProfile(DEFAULT_PROFILE);
+      setProfile(fallbackProfileState);
       setSlotKeys(INITIAL_SLOT_KEYS);
       setAllDays(fallbackDays);
       setCurrentDayId(INITIAL_DAY_ID);
       setProfileNameDraft(fallbackMeta.name);
-      saveState(makeProfileKey(fallbackId, 'profile'), DEFAULT_PROFILE);
+      saveState(makeProfileKey(fallbackId, 'profile'), fallbackProfileState);
       saveState(makeProfileKey(fallbackId, 'slots'), INITIAL_SLOT_KEYS);
       saveState(makeProfileKey(fallbackId, 'days'), fallbackDays);
       saveState(makeProfileKey(fallbackId, 'current_day'), INITIAL_DAY_ID);
@@ -642,7 +684,7 @@ function App(){
   const ProfilePhotoUploader = ({ photoUrl, handleUpload, isDisabled }) => (
     <div className={`flex flex-col items-center mb-4 ${isDisabled ? 'opacity-50':''}`}>
       <label htmlFor="profile-photo-upload" className={isDisabled ? '' : 'cursor-pointer'}>
-        <img src={photoUrl} alt="Foto de Perfil" className={`w-24 h-24 rounded-full object-cover border-4 border-slate-600 transition duration-150 ${isDisabled?'grayscale':'hover:border-emerald-500'}`} onError={(e)=> e.target.src = DEFAULT_PROFILE.photoUrl }/>
+        <img src={photoUrl} alt="Foto de Perfil" className={`w-24 h-24 rounded-full object-cover border-4 border-slate-600 transition duration-150 ${isDisabled?'grayscale':'hover:border-emerald-500'}`} onError={(e)=> e.target.src = DEFAULT_PROFILE_BASE.photoUrl }/>
         <input id="profile-photo-upload" type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={isDisabled}/>
       </label>
       <p className="text-xs text-slate-400 mt-2">{isDisabled ? 'Informações fixadas' : 'Clique para alterar foto'}</p>
@@ -979,7 +1021,7 @@ function App(){
 
 /* Render */
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+root.render(React.createElement(App));
   </script>
 </body>
 </html>
